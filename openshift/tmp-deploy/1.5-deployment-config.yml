@@ -1,0 +1,84 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  annotations:
+    app.openshift.io/route-disabled: 'false'
+    openshift.io/generated-by: OpenShiftWebConsole
+  name: todo-oh
+  namespace: todo-oh
+  labels:
+    app: todo-oh
+    app.kubernetes.io/component: todo-oh
+    app.kubernetes.io/instance: todo-oh
+    app.kubernetes.io/name: todo-oh
+    app.kubernetes.io/part-of: todo-oh
+    app.openshift.io/runtime: 3scale
+    app.openshift.io/runtime-namespace: todo-oh
+    app.openshift.io/runtime-version: todo-oh
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - todo-oh
+        from:
+          kind: ImageStreamTag
+          namespace: todo-oh
+          name: 'todo-oh:latest'
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: todo-oh
+    deploymentconfig: todo-oh
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: todo-oh
+        deploymentconfig: todo-oh
+    spec:
+      containers:
+        - name: todo-oh
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          env:
+            - name: SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-oh-config
+                  key: SERVER_URL
+            - name: CLOUDANT_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-oh-config
+                  key: CLOUDANT_URL
+            - name: CLOUDANT_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-oh-config
+                  key: CLOUDANT_DB_NAME
+            - name: CLOUDANT_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: todo-oh-secret
+                  key: apikey          
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
