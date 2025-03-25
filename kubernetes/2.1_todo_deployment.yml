@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: todo-app-deployment
-  namespace: todo-app-xx
+  namespace: todo-app-oh
   labels:
     app: todo-app
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: todo-nextjs
-        image: quay.io/rpailer/todo-app:latest
+        image: quay.io/olaf_hahn_at/todo-app-oh:latest
         ports:
         - containerPort: 3000
           name: todo
